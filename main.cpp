@@ -1,6 +1,7 @@
 #include <iostream>
 #include <regex>
 #include "cxxopts.hpp"
+#include "core.hpp"
 
 int main(int argc, char *argv[]) {
     cxxopts::Options options("Sudoku", "Sudoku solver & generator");
@@ -33,6 +34,13 @@ int main(int argc, char *argv[]) {
 
             std::cout << "生成终盘" << std::endl;
             std::cout << "需要的数独终盘数量：" << count << std::endl;
+
+            for (int i = 1; i <= count; i++) {
+                std::cout << "生成第 " << i << " 个数独终盘：" << std::endl;
+                board_t board = generate_final_board();
+                print_board(board);
+                write_board("final_" + std::to_string(i) + ".txt", board);
+            }
             return 0;
         }
 
@@ -42,6 +50,12 @@ int main(int argc, char *argv[]) {
 
             std::cout << "求解数独" << std::endl;
             std::cout << "数独文件：" << filename << std::endl;
+
+            board_t board = read_board(filename);
+            board_t solved_board = solve_board(board);
+            std::cout << "求解结果：" << std::endl;
+            print_board(solved_board);
+            write_board("sudoku.txt", solved_board);
             return 0;
         }
 
@@ -76,6 +90,13 @@ int main(int argc, char *argv[]) {
             std::cout << "游戏难度：" << mode << std::endl;
             std::cout << "挖空数量范围：" << range.first << " ~ " << range.second << std::endl;
             std::cout << "解唯一：" << (unique ? "是" : "否") << std::endl;
+
+            for (int i = 1; i <= number; i++) {
+                std::cout << "生成第 " << i << " 个游戏：" << std::endl;
+                board_t board = generate_game_board(mode, range, unique);
+                print_board(board);
+                write_board("game_" + std::to_string(i) + ".txt", board);
+            }
             return 0;
         }
 
