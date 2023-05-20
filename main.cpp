@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
         }
 
     } catch (std::exception &e) {
-        std::cout << "参数格式不正确" << std::endl;
+        std::cout << e.what() << std::endl;
         return 1;
     }
 
