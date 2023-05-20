@@ -3,21 +3,15 @@
 #include "cxxopts.hpp"
 
 int main(int argc, char *argv[]) {
-    // -c 需要的数独终盘数量
-    // -s 求解的文件
-    // -n 需要的游戏数量
-    // -m 生成游戏的难度
-    // -r 生成游戏中挖空的数量范围
-    // -u 生成游戏的解唯一
     cxxopts::Options options("Sudoku", "Sudoku solver & generator");
     options.add_options()
-            ("c,count", "Number of sudoku to solve", cxxopts::value<int>())
-            ("s,solve", "Sudoku file to solve", cxxopts::value<std::string>())
-            ("n,number", "Number of sudoku to generate", cxxopts::value<int>())
-            ("m,mode", "Difficulty of sudoku to generate", cxxopts::value<int>())
-            ("r,range", "Range of number to dig", cxxopts::value<std::string>())
-            ("u,unique", "Unique solution", cxxopts::value<bool>()->default_value("false"))
-            ("h,help", "Print usage");
+            ("c,count", "需要的数独终盘数量（1-1000000）", cxxopts::value<int>())
+            ("s,solve", "需要解的数独棋盘文件路径", cxxopts::value<std::string>())
+            ("n,number", "需要的游戏数量（1-10000）", cxxopts::value<int>())
+            ("m,mode", "生成的游戏难度（1-3）", cxxopts::value<int>())
+            ("r,range", "生成游戏中挖空的数量范围（20~55）", cxxopts::value<std::string>())
+            ("u,unique", "生成游戏的解唯一", cxxopts::value<bool>()->default_value("false"))
+            ("h,help", "显示帮助信息");
     try {
 
         auto result = options.parse(argc, argv);
