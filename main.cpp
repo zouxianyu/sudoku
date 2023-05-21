@@ -35,12 +35,6 @@ int main(int argc, char *argv[]) {
             std::cout << "生成终盘" << std::endl;
             std::cout << "需要的数独终盘数量：" << count << std::endl;
 
-            // for (int i = 1; i <= count; i++) {
-            //     std::cout << "生成第 " << i << " 个数独终盘：" << std::endl;
-            //     // board_t board = generate_final_board(count);
-            //     //print_board(board);
-            //     //write_board("final_" + std::to_string(i) + ".txt", board);
-            // }
             generate_final_board(count);
             return 0;
         }
@@ -52,6 +46,7 @@ int main(int argc, char *argv[]) {
             std::cout << "求解数独" << std::endl;
             std::cout << "数独文件：" << filename << std::endl;
 
+            // TODO: 修改为从一个文件中读取若干个board并求解
             board_t board = read_board(filename);
             board_t solved_board = solve_board(board);
             std::cout << "求解结果：" << std::endl;

@@ -3,6 +3,8 @@
 #include <algorithm>
 #include "core.hpp"
 
+bool flag = 0;
+
 board_t read_board(const std::string &filename) {
     std::ifstream fin(filename);
     if (!fin) {
@@ -29,6 +31,7 @@ board_t read_board(const std::string &filename) {
     return board;
 }
 
+// TODO: 修改为append类型的写入
 void write_board(const std::string &filename, const board_t &board) {
     std::ofstream fout(filename);
     for (int i = 0; i < 9; i++) {
@@ -104,9 +107,78 @@ void generate_final_board(const int count) {
     }while(std::next_permutation(first_line+1, first_line+9));
 }
 
+void prune(int i, int j, bool num[10], board_t &res){
+    // 排除本行已有的数字
+    for(int k = 0; k < 9; k++){
+        if(k == j || res[i][k] == 0)continue;
+        num[res[i][k]] = 1;
+    }
+
+    // 排除本列已有的数字
+    for(int k = 0; k < 9; k++){
+        if(k == i || res[k][j] == 0)continue;
+        num[res[k][j]] = 1;
+    }
+
+    // 排除九宫格内已有的数字
+    int n, m;
+    if(i / 3 == 0)n = 0;
+    else if(i / 6 == 0)n = 3;
+    else n = 6;
+
+    if(j / 3 == 0)m = 0;
+    else if(j / 6 == 0)m = 3;
+    else m = 6;
+
+    for(int p = n; p < n + 3; p++){
+        for(int q = m; q < m + 3; q++){
+            if((p == i && q == j) || res[p][q] == 0)continue;
+            num[res[p][q]] = 1;
+        }
+    }
+
+}
+
+void solve(int i, int j, board_t &res){
+    if(j == 9){
+        i++;
+        j = 0;
+    }
+    if(i == 9){
+        flag = 1;
+        return;
+    }
+
+    // 填数
+    if(res[i][j] == 0) {
+        // 剪枝，判断某个数字是否能填入
+        bool num[10] = {false};
+        prune(i, j, num, res);
+
+        // 轮流尝试填入1~9，并递归
+        for (int k = 1; k < 10; k++) {
+            if (num[k])continue;
+            res[i][j] = k;
+            solve(i, j + 1, res);
+            if (flag) return;
+            res[i][j] = 0;
+        }
+    }
+    else{
+        solve(i, j + 1, res);
+    }
+}
+
 board_t solve_board(const board_t &board) {
-    // TODO: 求解数独
-    return {};
+    flag = 0;
+    board_t res;
+    for(int i = 0; i < 9; i++){
+        for(int j = 0; j < 9; j++){
+            res[i][j]=board[i][j];
+        }
+    }
+    solve(0, 0, res);
+    return res;
 }
 
 board_t generate_game_board(int mode, std::pair<int, int> range, bool unique) {
