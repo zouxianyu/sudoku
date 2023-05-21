@@ -35,12 +35,13 @@ int main(int argc, char *argv[]) {
             std::cout << "生成终盘" << std::endl;
             std::cout << "需要的数独终盘数量：" << count << std::endl;
 
-            for (int i = 1; i <= count; i++) {
-                std::cout << "生成第 " << i << " 个数独终盘：" << std::endl;
-                board_t board = generate_final_board();
-                print_board(board);
-                write_board("final_" + std::to_string(i) + ".txt", board);
-            }
+            // for (int i = 1; i <= count; i++) {
+            //     std::cout << "生成第 " << i << " 个数独终盘：" << std::endl;
+            //     // board_t board = generate_final_board(count);
+            //     //print_board(board);
+            //     //write_board("final_" + std::to_string(i) + ".txt", board);
+            // }
+            generate_final_board(count);
             return 0;
         }
 

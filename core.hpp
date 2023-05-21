@@ -12,7 +12,7 @@ void write_board(const std::string &filename, const board_t &board);
 
 void print_board(const board_t &board);
 
-board_t generate_final_board();
+void generate_final_board(const int count);
 
 board_t solve_board(const board_t &board);
 
