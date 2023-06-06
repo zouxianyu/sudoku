@@ -1,8 +1,14 @@
-#ifndef SUDOKU_CORE_HPP
-#define SUDOKU_CORE_HPP
+/*
+# Copyright (c) 2023 Yuanyi Xu. All rights reserved.
+*/
+
+#ifndef SRC_CORE_HPP_
+#define SRC_CORE_HPP_
 
 #include <array>
 #include <string>
+#include <vector>
+#include <utility>
 
 using board_t = std::array<std::array<int, 9>, 9>;
 
@@ -21,4 +27,4 @@ std::vector<board_t>
 generate_game_boards(int count, int mode, std::pair<int, int> range,
                      bool unique);
 
-#endif //SUDOKU_CORE_HPP
+#endif  // SRC_CORE_HPP_

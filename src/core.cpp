@@ -1,9 +1,21 @@
+/*
+# Copyright (c) 2023 Yuanyi Xu. All rights reserved.
+*/
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 #include <vector>
-#include "core.hpp"
+#include <random>
+#include "../src/core.hpp"
+
+
+int cpp_rand() {
+    static std::mt19937 gen(std::random_device {}());
+    static std::uniform_int_distribution<> dis;
+    return dis(gen);
+}
 
 int flag = 0;
 
@@ -42,7 +54,7 @@ std::vector<board_t> read_boards(const std::string &filename) {
 void
 write_boards(const std::string &filename, const std::vector<board_t> &boards) {
     std::ofstream fout(filename);
-    for (const board_t &board: boards) {
+    for (const board_t &board : boards) {
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
                 char v = board[i][j] == 0 ? '$' : board[i][j] + '0';
@@ -62,7 +74,8 @@ void print_board(const board_t &board) {
             if (j % 3 == 0) {
                 std::cout << "| ";
             }
-            std::cout << (char) (board[i][j] == 0 ? ' ' : board[i][j] + '0')
+            std::cout << static_cast<char> (board[i][j] == 0 ?
+                         ' ' : board[i][j] + '0')
                       << " ";
         }
         std::cout << "|" << std::endl;
@@ -144,11 +157,13 @@ void prune(int i, int j, bool num[10], board_t &res) {
     int n, m;
     if (i / 3 == 0)n = 0;
     else if (i / 6 == 0)n = 3;
-    else n = 6;
+    else
+        n = 6;
 
     if (j / 3 == 0)m = 0;
     else if (j / 6 == 0)m = 3;
-    else m = 6;
+    else
+        m = 6;
 
     for (int p = n; p < n + 3; p++) {
         for (int q = m; q < m + 3; q++) {
@@ -156,7 +171,6 @@ void prune(int i, int j, bool num[10], board_t &res) {
             num[res[p][q]] = 1;
         }
     }
-
 }
 
 void solve(int i, int j, board_t &res, int solve_num) {
@@ -206,11 +220,11 @@ board_t dig(board_t final_board, int req_num) {
     int st_i = 0, st_j = 0;
     while (st_i != 9) {
         int hole[2];
-        hole[0] = rand() % 9;
-        hole[1] = rand() % 9;
+        hole[0] = cpp_rand() % 9;
+        hole[1] = cpp_rand() % 9;
         // 防止重复
         while (hole[0] == hole[1]) {
-            hole[1] = rand() % 9;
+            hole[1] = cpp_rand() % 9;
         }
         for (int k = 0; k < 2; k++) {
             int i = hole[k] / 3;
@@ -227,11 +241,12 @@ board_t dig(board_t final_board, int req_num) {
     // 挖剩下的空
     req_num -= 18;
     while (req_num--) {
-        int i = rand() % 9;
-        int j = rand() % 9;
+        int i = cpp_rand() % 9;
+        int j = cpp_rand() % 9;
 
         if (final_board[i][j] != 0)final_board[i][j] = 0;
-        else req_num++;
+        else
+            req_num++;
     }
 
     return final_board;
@@ -244,25 +259,26 @@ board_t generate_game_board_impl(const board_t &final_board, int mode,
     if ((range.second - range.first + 1) % 3 == 0) {
         int gap = (range.second - range.first + 1) / 3;
         req_num = range.first + (mode - 1) * gap;
-        req_num += rand() % gap;
+        req_num += cpp_rand() % gap;
     } else if ((range.second - range.first + 1) % 3 == 1) {
         int gap[3] = {(range.second - range.first + 1) / 3,
                       (range.second - range.first + 1) / 3,
                       (range.second - range.first + 1) / 3 + 1};
         req_num = range.first + (mode - 1) * gap[0];
-        req_num += rand() % gap[mode - 1];
+        req_num += cpp_rand() % gap[mode - 1];
     } else {
         int gap[3] = {(range.second - range.first + 1) / 3 + 1,
                       (range.second - range.first + 1) / 3 + 1,
                       (range.second - range.first + 1) / 3};
         req_num = range.first + (mode - 1) * gap[0];
-        req_num += rand() % gap[mode - 1];
+        req_num += cpp_rand() % gap[mode - 1];
     }
 
     // 根据要求生成唯一解/多解的游戏
     board_t game_board = dig(final_board, req_num);
-    if (!unique) return game_board;
-    else {
+    if (!unique) {
+        return game_board;
+    } else {
         board_t res;
 
         // 如果当前游戏的解数大于1，重新生成
@@ -278,7 +294,7 @@ board_t generate_game_board_impl(const board_t &final_board, int mode,
             // 唯一解，退出
             if (flag == 1)return game_board;
 
-            //非唯一解，重新生成
+            // 非唯一解，重新生成
             game_board = dig(final_board, req_num);
         }
     }

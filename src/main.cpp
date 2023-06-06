@@ -1,7 +1,11 @@
+/*
+# Copyright (c) 2023 Yuanyi Xu. All rights reserved.
+*/
+
 #include <iostream>
 #include <regex>
-#include "cxxopts.hpp"
-#include "core.hpp"
+#include "./cxxopts.hpp"
+#include "./core.hpp"
 
 int main(int argc, char *argv[]) {
     cxxopts::Options options("Sudoku", "Sudoku solver & generator");
@@ -18,7 +22,6 @@ int main(int argc, char *argv[]) {
              cxxopts::value<bool>()->default_value("false"))
             ("h,help", "显示帮助信息");
     try {
-
         auto result = options.parse(argc, argv);
 
         if (result.count("help")) {
@@ -28,7 +31,6 @@ int main(int argc, char *argv[]) {
 
         // 判断是否为生成终盘
         if (result.count("count")) {
-
             // 参数获取 & 校验
             int count = result["count"].as<int>();
             if (!(count >= 1 && count <= 1000000)) {
@@ -42,7 +44,7 @@ int main(int argc, char *argv[]) {
 
             std::vector<board_t> boards = generate_final_boards(count);
             size_t i = 1;
-            for (const board_t &board: boards) {
+            for (const board_t &board : boards) {
                 // 打印终局
                 std::cout << "生成第 " << i++ << " 个数独终盘：" << std::endl;
                 print_board(board);
@@ -50,7 +52,6 @@ int main(int argc, char *argv[]) {
             write_boards("final.txt", boards);
             return 0;
         }
-
         // 判断是否为求解数独
         if (result.count("solve")) {
             std::string filename = result["solve"].as<std::string>();
@@ -59,7 +60,7 @@ int main(int argc, char *argv[]) {
             std::cout << "数独文件：" << filename << std::endl;
 
             std::vector<board_t> boards = read_boards(filename);
-            for (board_t &board: boards) {
+            for (board_t &board : boards) {
                 board = solve_board(board);
                 std::cout << "求解结果：" << std::endl;
                 print_board(board);
@@ -106,7 +107,7 @@ int main(int argc, char *argv[]) {
             std::vector<board_t> boards =
                     generate_game_boards(number, mode, range, unique);
             size_t i = 1;
-            for (const board_t &board: boards) {
+            for (const board_t &board : boards) {
                 // 打印游戏
                 std::cout << "生成第 " << i++ << " 个游戏：" << std::endl;
                 print_board(board);
@@ -114,13 +115,10 @@ int main(int argc, char *argv[]) {
             write_boards("game.txt", boards);
             return 0;
         }
-
     } catch (std::exception &e) {
         std::cout << e.what() << std::endl;
         return 1;
     }
-
     std::cout << "参数格式不正确" << std::endl;
     return 1;
-
 }
