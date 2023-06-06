@@ -9,8 +9,8 @@ int main(int argc, char *argv[]) {
             ("c,count", "需要的数独终盘数量（1-1000000）", cxxopts::value<int>())
             ("s,solve", "需要解的数独棋盘文件路径", cxxopts::value<std::string>())
             ("n,number", "需要的游戏数量（1-10000）", cxxopts::value<int>())
-            ("m,mode", "生成的游戏难度（1-3）", cxxopts::value<int>())
-            ("r,range", "生成游戏中挖空的数量范围（20~55）", cxxopts::value<std::string>())
+            ("m,mode", "生成的游戏难度（1-3）", cxxopts::value<int>()->default_value("1"))
+            ("r,range", "生成游戏中挖空的数量范围（20~55）", cxxopts::value<std::string>()->default_value("20~55"))
             ("u,unique", "生成游戏的解唯一", cxxopts::value<bool>()->default_value("false"))
             ("h,help", "显示帮助信息");
     try {
@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
         }
 
         // 判断是否为生成游戏
-        if (result.count("number") && result.count("mode") && result.count("range")) {
+        if (result.count("number")) {
             int number = result["number"].as<int>();
             int mode = result["mode"].as<int>();
             std::string range_str = result["range"].as<std::string>();
