@@ -7,11 +7,15 @@ int main(int argc, char *argv[]) {
     cxxopts::Options options("Sudoku", "Sudoku solver & generator");
     options.add_options()
             ("c,count", "需要的数独终盘数量（1-1000000）", cxxopts::value<int>())
-            ("s,solve", "需要解的数独棋盘文件路径", cxxopts::value<std::string>())
+            ("s,solve", "需要解的数独棋盘文件路径",
+             cxxopts::value<std::string>())
             ("n,number", "需要的游戏数量（1-10000）", cxxopts::value<int>())
-            ("m,mode", "生成的游戏难度（1-3）", cxxopts::value<int>()->default_value("1"))
-            ("r,range", "生成游戏中挖空的数量范围（20~55）", cxxopts::value<std::string>()->default_value("20~55"))
-            ("u,unique", "生成游戏的解唯一", cxxopts::value<bool>()->default_value("false"))
+            ("m,mode", "生成的游戏难度（1-3）",
+             cxxopts::value<int>()->default_value("1"))
+            ("r,range", "生成游戏中挖空的数量范围（20~55）",
+             cxxopts::value<std::string>()->default_value("20~55"))
+            ("u,unique", "生成游戏的解唯一",
+             cxxopts::value<bool>()->default_value("false"))
             ("h,help", "显示帮助信息");
     try {
 
@@ -28,7 +32,8 @@ int main(int argc, char *argv[]) {
             // 参数获取 & 校验
             int count = result["count"].as<int>();
             if (!(count >= 1 && count <= 1000000)) {
-                std::cout << "需要的数独终盘数量应在 1 ~ 1000000 之间" << std::endl;
+                std::cout << "需要的数独终盘数量应在 1 ~ 1000000 之间"
+                          << std::endl;
                 return 1;
             }
 
@@ -79,12 +84,14 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
             std::smatch m;
-            if (!std::regex_match(range_str, m, std::regex(R"(^(\d+)~(\d+)$)"))) {
+            if (!std::regex_match(range_str, m,
+                                  std::regex(R"(^(\d+)~(\d+)$)"))) {
                 std::cout << "挖空数量范围格式错误，应为：20~55" << std::endl;
                 return 1;
             }
             std::pair range = {std::stoi(m[1]), std::stoi(m[2])};
-            if (!(range.first >= 20 && range.second <= 55 && range.first <= range.second)) {
+            if (!(range.first >= 20 && range.second <= 55 &&
+                  range.first <= range.second)) {
                 std::cout << "挖空数量范围应在 20 ~ 55 之间" << std::endl;
                 return 1;
             }
@@ -92,7 +99,8 @@ int main(int argc, char *argv[]) {
             std::cout << "生成游戏" << std::endl;
             std::cout << "需要的游戏数量：" << number << std::endl;
             std::cout << "游戏难度：" << mode << std::endl;
-            std::cout << "挖空数量范围：" << range.first << " ~ " << range.second << std::endl;
+            std::cout << "挖空数量范围：" << range.first << " ~ " << range.second
+                      << std::endl;
             std::cout << "解唯一：" << (unique ? "是" : "否") << std::endl;
 
             std::vector<board_t> boards =
