@@ -46,7 +46,6 @@ int main(int argc, char *argv[]) {
             std::cout << "求解数独" << std::endl;
             std::cout << "数独文件：" << filename << std::endl;
 
-            // TODO: 修改为从一个文件中读取若干个board并求解
             board_t board = read_board(filename);
             board_t solved_board = solve_board(board);
             std::cout << "求解结果：" << std::endl;
@@ -91,7 +90,7 @@ int main(int argc, char *argv[]) {
                 std::cout << "生成第 " << i << " 个游戏：" << std::endl;
                 board_t board = generate_game_board(mode, range, unique);
                 print_board(board);
-                write_board("game_" + std::to_string(i) + ".txt", board);
+                write_board("game.txt", board);
             }
             return 0;
         }

@@ -3,8 +3,9 @@
 #include <algorithm>
 #include "core.hpp"
 
-bool flag = 0;
+int flag = 0;
 
+// TODO: 修改为从一个文件中读取若干个board并求解
 board_t read_board(const std::string &filename) {
     std::ifstream fin(filename);
     if (!fin) {
@@ -139,13 +140,13 @@ void prune(int i, int j, bool num[10], board_t &res){
 
 }
 
-void solve(int i, int j, board_t &res){
+void solve(int i, int j, board_t &res, int solve_num){
     if(j == 9){
         i++;
         j = 0;
     }
     if(i == 9){
-        flag = 1;
+        flag++;
         return;
     }
 
@@ -159,13 +160,13 @@ void solve(int i, int j, board_t &res){
         for (int k = 1; k < 10; k++) {
             if (num[k])continue;
             res[i][j] = k;
-            solve(i, j + 1, res);
-            if (flag) return;
+            solve(i, j + 1, res, solve_num);
+            if (flag == solve_num) return;
             res[i][j] = 0;
         }
     }
     else{
-        solve(i, j + 1, res);
+        solve(i, j + 1, res, solve_num);
     }
 }
 
@@ -174,14 +175,97 @@ board_t solve_board(const board_t &board) {
     board_t res;
     for(int i = 0; i < 9; i++){
         for(int j = 0; j < 9; j++){
-            res[i][j]=board[i][j];
+            res[i][j] = board[i][j];
         }
     }
-    solve(0, 0, res);
+    solve(0, 0, res, 1);
     return res;
+}
+
+// 挖空数独终局生成数独
+board_t dig(board_t final_board, int req_num){
+    // 先在每个3*3中挖2个空
+    int st_i = 0, st_j = 0;
+    while(st_i != 9){
+        int hole[2];
+        hole[0] = rand() % 9;
+        hole[1] = rand() % 9;
+        // 防止重复
+        while(hole[0] == hole[1]){
+            hole[1] = rand() % 9;
+        }
+        for(int k = 0; k < 2; k++){
+            int i = hole[k] / 3;
+            int j = hole[k] % 3;
+            final_board[st_i + i][st_j + j] = 0;
+        }
+        st_j += 3;
+        if (st_j == 9){
+            st_j = 0;
+            st_i += 3;
+        }
+    }
+
+    // 挖剩下的空
+    req_num -= 18;
+    while (req_num--)
+    {
+        int i = rand() % 9;
+        int j = rand() % 9;
+
+        if (final_board[i][j] != 0)final_board[i][j] = 0;
+        else req_num++;
+    }
+
+    return final_board;
 }
 
 board_t generate_game_board(int mode, std::pair<int, int> range, bool unique) {
     // TODO: 生成游戏
-    return {};
+    board_t final_board = read_board("final_board.txt");
+    // 根据难度进一步确认挖空范围
+    int req_num = 0;
+    if((range.second - range.first + 1) % 3 == 0){
+        int gap = (range.second - range.first + 1) / 3;
+        req_num = range.first + (mode - 1) * gap;
+        req_num += rand() % gap;
+    }
+    else if((range.second - range.first + 1) % 3 == 1){
+        int gap[3] = {(range.second - range.first + 1) / 3,
+                      (range.second - range.first + 1) / 3,
+                      (range.second - range.first + 1) / 3 + 1};
+        req_num = range.first + (mode - 1) * gap[0];
+        req_num += rand() % gap[mode - 1];
+    }
+    else {
+        int gap[3] = {(range.second - range.first + 1) / 3 + 1,
+                      (range.second - range.first + 1) / 3 + 1,
+                      (range.second - range.first + 1) / 3};
+        req_num = range.first + (mode - 1) * gap[0];
+        req_num += rand() % gap[mode - 1];
+    }
+
+    // 根据要求生成唯一解/多解的游戏
+    board_t game_board = dig(final_board, req_num);
+    if (!unique) return game_board;
+    else{
+        board_t res;
+
+        // 如果当前游戏的解数大于1，重新生成
+        while(1){
+            flag = 0;
+            for(int i = 0; i < 9; i++){
+                for(int j = 0; j < 9; j++){
+                    res[i][j] = game_board[i][j];
+                }
+            }
+            solve(0, 0, res, 2);
+
+            // 唯一解，退出
+            if(flag == 1)return game_board;
+
+            //非唯一解，重新生成
+            game_board = dig(final_board, req_num);
+        }
+    }
 }
