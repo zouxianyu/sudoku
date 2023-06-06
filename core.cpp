@@ -1,45 +1,54 @@
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <algorithm>
+#include <vector>
 #include "core.hpp"
 
 int flag = 0;
 
-// TODO: 修改为从一个文件中读取若干个board并求解
-board_t read_board(const std::string &filename) {
+std::vector<board_t> read_boards(const std::string &filename) {
     std::ifstream fin(filename);
     if (!fin) {
         throw std::runtime_error("数独文件不存在");
     }
 
-    board_t board;
-    for (int i = 0; i < 9; i++) {
-        for (int j = 0; j < 9; j++) {
-            if (!fin) {
-                throw std::runtime_error("数独文件格式错误");
+    std::vector<board_t> boards;
+
+    std::string line;
+    while (std::getline(fin, line) && !line.empty()) {
+        std::stringstream linein(line);
+
+        board_t board;
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                char v{};
+                linein >> v;
+                if (!(v >= '1' && v <= '9' || v == '$')) {
+                    throw std::runtime_error("数独文件格式错误");
+                }
+                if (v == '$') {
+                    v = '0';
+                }
+                board[i][j] = v - '0';
             }
-            char v;
-            fin >> v;
-            if (!(v >= '1' && v <= '9' || v == '$')) {
-                throw std::runtime_error("数独文件格式错误");
-            }
-            if (v == '$') {
-                v = '0';
-            }
-            board[i][j] = v - '0';
         }
+        boards.emplace_back(board);
     }
-    return board;
+
+    return boards;
 }
 
-// TODO: 修改为append类型的写入
-void write_board(const std::string &filename, const board_t &board) {
+void write_boards(const std::string &filename, const std::vector<board_t> &boards) {
     std::ofstream fout(filename);
-    for (int i = 0; i < 9; i++) {
-        for (int j = 0; j < 9; j++) {
-            char v = board[i][j] == 0 ? '$' : board[i][j] + '0';
-            fout << v;
+    for (const board_t &board: boards) {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                char v = board[i][j] == 0 ? '$' : board[i][j] + '0';
+                fout << v;
+            }
         }
+        fout << std::endl;
     }
 }
 
@@ -59,7 +68,8 @@ void print_board(const board_t &board) {
     std::cout << "+-------+-------+-------+" << std::endl;
 }
 
-void generate_final_board(const int count) {
+std::vector<board_t> generate_final_boards(int count) {
+    std::vector<board_t> result;
     int n = count;
     int first_line[9] = {5,1,2,3,4,6,7,8,9};
     int shift[9] = {0,3,6,1,4,7,2,5,8};
@@ -76,9 +86,6 @@ void generate_final_board(const int count) {
                 board[i][j] = first_line[(j + shift[i]) % 9];
             }
         }
-
-        // 打印基础终局
-        print_board(board);
 
         // 由基础终局总共演化出36个终局
         // 前3行保持不变
@@ -99,13 +106,13 @@ void generate_final_board(const int count) {
                     }
                 }
 
-                // 存储到文件
-                write_board("final_board.txt", new_board);
+                result.emplace_back(new_board);
                 n--;
-                if(!n)return;
+                if(!n)return result;
             }
         }
     }while(std::next_permutation(first_line+1, first_line+9));
+    return result;
 }
 
 void prune(int i, int j, bool num[10], board_t &res){
@@ -221,8 +228,7 @@ board_t dig(board_t final_board, int req_num){
 }
 
 board_t generate_game_board(int mode, std::pair<int, int> range, bool unique) {
-    // TODO: 生成游戏
-    board_t final_board = read_board("final_board.txt");
+    board_t final_board = generate_final_boards(1).front();
     // 根据难度进一步确认挖空范围
     int req_num = 0;
     if((range.second - range.first + 1) % 3 == 0){

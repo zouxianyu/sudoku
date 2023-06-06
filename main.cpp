@@ -35,7 +35,14 @@ int main(int argc, char *argv[]) {
             std::cout << "生成终盘" << std::endl;
             std::cout << "需要的数独终盘数量：" << count << std::endl;
 
-            generate_final_board(count);
+            std::vector<board_t> boards = generate_final_boards(count);
+            size_t i = 1;
+            for (const board_t &board: boards) {
+                // 打印终局
+                std::cout << "生成第 " << i++ << " 个数独终盘：" << std::endl;
+                print_board(board);
+            }
+            write_boards("final.txt", boards);
             return 0;
         }
 
@@ -46,11 +53,13 @@ int main(int argc, char *argv[]) {
             std::cout << "求解数独" << std::endl;
             std::cout << "数独文件：" << filename << std::endl;
 
-            board_t board = read_board(filename);
-            board_t solved_board = solve_board(board);
-            std::cout << "求解结果：" << std::endl;
-            print_board(solved_board);
-            write_board("sudoku.txt", solved_board);
+            std::vector<board_t> boards = read_boards(filename);
+            for (board_t &board: boards) {
+                board = solve_board(board);
+                std::cout << "求解结果：" << std::endl;
+                print_board(board);
+            }
+            write_boards("sudoku.txt", boards);
             return 0;
         }
 
@@ -86,12 +95,14 @@ int main(int argc, char *argv[]) {
             std::cout << "挖空数量范围：" << range.first << " ~ " << range.second << std::endl;
             std::cout << "解唯一：" << (unique ? "是" : "否") << std::endl;
 
+            std::vector<board_t> boards;
             for (int i = 1; i <= number; i++) {
                 std::cout << "生成第 " << i << " 个游戏：" << std::endl;
                 board_t board = generate_game_board(mode, range, unique);
                 print_board(board);
-                write_board("game.txt", board);
+                boards.emplace_back(board);
             }
+            write_boards("game.txt", boards);
             return 0;
         }
 
