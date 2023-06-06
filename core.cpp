@@ -227,8 +227,7 @@ board_t dig(board_t final_board, int req_num){
     return final_board;
 }
 
-board_t generate_game_board(int mode, std::pair<int, int> range, bool unique) {
-    board_t final_board = generate_final_boards(1).front();
+board_t generate_game_board_impl(const board_t &final_board, int mode, std::pair<int, int> range, bool unique) {
     // 根据难度进一步确认挖空范围
     int req_num = 0;
     if((range.second - range.first + 1) % 3 == 0){
@@ -274,4 +273,14 @@ board_t generate_game_board(int mode, std::pair<int, int> range, bool unique) {
             game_board = dig(final_board, req_num);
         }
     }
+}
+
+std::vector<board_t> generate_game_boards(int count, int mode, std::pair<int, int> range, bool unique) {
+    std::vector<board_t> result;
+    std::vector<board_t> final_boards = generate_final_boards(count);
+    result.reserve(count);
+    for (int i = 0; i < count; i++) {
+        result.emplace_back(generate_game_board_impl(final_boards[i], mode, range, unique));
+    }
+    return result;
 }

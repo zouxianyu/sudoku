@@ -16,6 +16,6 @@ std::vector<board_t> generate_final_boards(int count);
 
 board_t solve_board(const board_t &board);
 
-board_t generate_game_board(int mode, std::pair<int, int> range, bool unique);
+std::vector<board_t> generate_game_boards(int count, int mode, std::pair<int, int> range, bool unique);
 
 #endif //SUDOKU_CORE_HPP

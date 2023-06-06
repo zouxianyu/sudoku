@@ -95,12 +95,13 @@ int main(int argc, char *argv[]) {
             std::cout << "挖空数量范围：" << range.first << " ~ " << range.second << std::endl;
             std::cout << "解唯一：" << (unique ? "是" : "否") << std::endl;
 
-            std::vector<board_t> boards;
-            for (int i = 1; i <= number; i++) {
-                std::cout << "生成第 " << i << " 个游戏：" << std::endl;
-                board_t board = generate_game_board(mode, range, unique);
+            std::vector<board_t> boards =
+                    generate_game_boards(number, mode, range, unique);
+            size_t i = 1;
+            for (const board_t &board: boards) {
+                // 打印游戏
+                std::cout << "生成第 " << i++ << " 个游戏：" << std::endl;
                 print_board(board);
-                boards.emplace_back(board);
             }
             write_boards("game.txt", boards);
             return 0;
